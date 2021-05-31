@@ -1,26 +1,26 @@
 all: build run clean
 
 ex-eng-freq: build
-			 ./.compiled -f dictionaries/english-freq.txt
+			 ./.compiled dictionaries/english-freq.txt
 			 rm .compiled
 
 ex-eng: build
-		./.compiled -f dictionaries/english.txt
+		./.compiled dictionaries/english.txt
 		rm .compiled
 
 ex-pt-lg: build
-		  ./.compiled -f dictionaries/portuguese-large.txt
+		  ./.compiled dictionaries/portuguese-large.txt
 		  rm .compiled
 
 ex-pt: build
-	   ./.compiled -f dictionaries/portuguese.txt
+	   ./.compiled dictionaries/portuguese.txt
 	   rm .compiled
 
 build: 
 	gcc -Wextra -Wall -o .compiled main.c
 
 run: 
-	./.compiled -f ${file}
+	./.compiled ${file}
 
 clean: 
 	rm .compiled
