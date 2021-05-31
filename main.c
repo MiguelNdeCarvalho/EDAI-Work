@@ -9,50 +9,26 @@ int main(int argc, char const *argv[])
 
     if(argc == 1)
     {
-        printf("You forgot to pass the arguments. Use -h or --help argument to see some examples.");
+        printf("You need to pass a file name.\n");
+        printf("usage: main file");
         exit(1);
     }
 
-    else if (argc >= 2)
+    else if (argc == 2)
     {
-        if (strcmp( argv[1], "-h") == 0 || strcmp( argv[1], "--help") == 0)
+        f = fopen(argv[1], "r");
+
+        if(f == NULL)
         {
-            printf("usage: main -f file \n");
-            exit(0);
-        }
-
-        else if (strcmp( argv[1], "-f") == 0 || strcmp( argv[1], "--file") == 0)
-        {
-            if(argv[2] == NULL)
-            {
-                printf("You didn't pass a file.\n");
-                printf("Try 'main -h' for more information.");
-                exit(1);
-            }
-
-            else {
-                f = fopen(argv[2], "r");
-
-                if(f == NULL)
-                {
-                    printf("File not found!\nCheck if the path of the file is correct.");
-                    return 1;
-                }
-            }
-        }
-
-        else
-        {
-            printf("Unknown option: %s\n", argv[1]);
-            printf("Try 'main -h' for more information.");
+            printf("File not found!\nCheck if the path of the file is correct.");
             exit(1);
-        } 
-
+        }
     }
 
-    else if(argc > 3)
+    else
     {
-        printf("I don`t need so many arguments. Use -h or --help argument to see some examples.");
+        printf("I don`t need so many arguments. Just pass the file location.\n");
+        printf("usage: main file");
         exit(1);
     }
     
