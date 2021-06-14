@@ -2,40 +2,40 @@
 #include "hashsep.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <wchar.h>
+#include <locale.h>
 
 #define MinTableSize (10)
 typedef unsigned int Index;
 typedef Position List;
 
-
-struct ListNode{
+struct ListNode
+{
     ElementType Element;
     Position    Next;
 };
 
-
-struct HashTbl{
+struct HashTbl
+{
     int TableSize;
     List *TheLists;
 };
 
 
 /* Return next prime; assume N >= MinTableSize */
-static int NextPrime( int N ){
-    int i;
-
-    if( N % 2 == 0 )
+static int NextPrime( int N )
+{
+    if(N % 2 == 0)
         N++;
-    for( ; ; N += 2 ){
-        for( i = 3; i * i <= N; i += 2 )
-            if( N % i == 0 )
+    for(;;N += 2)
+    {
+        for(int i = 3; i * i <= N; i += 2)
+            if(N % i == 0)
                 goto ContOuter;  /* Sorry about this! */
         return N;
-    ContOuter: ;
+    ContOuter:;
     }
 }
-
 
 /* Hash function for ints */
 Index Hash( ElementType Key, int TableSize ){
@@ -46,48 +46,48 @@ Index Hash( ElementType Key, int TableSize ){
 /* Initialize the Table, 
 making the correspondent malloc() and allocate the array of lists and them Headers 
 to use on HashTable positions */
-HashTable InitializeTable( int TableSize ){
+HashTable InitializeTable(int TableSize)
+{
     HashTable H;
     int i;
 
-    if( TableSize < MinTableSize ){
-        Error( "Table size too small" );
+    if(TableSize < MinTableSize)
+    {
+        Error("Table size too small");
         return NULL;
     }
 
     /* Allocate table */
-    H = malloc( sizeof( struct HashTbl ) );
-    if( H == NULL )
+    H = malloc(sizeof(struct HashTbl));
+    if(H == NULL)
         FatalError( "Out of space!!!" );
 
-        H->TableSize = NextPrime( TableSize );
+    H->TableSize = NextPrime(TableSize);
 
     /* Allocate array of lists */
-    H->TheLists = malloc( sizeof( List ) * H->TableSize );
-    if( H->TheLists == NULL )
-        FatalError( "Out of space!!!" );
+    H->TheLists = malloc(sizeof(List) * H->TableSize);
+    if(H->TheLists == NULL)
+        FatalError("Out of space!!!");
 
     /* Allocate list headers */
-    for( i = 0; i < H->TableSize; i++ ){
-        H->TheLists[ i ] = malloc( sizeof( struct ListNode ) );
-        if( H->TheLists[ i ] == NULL )
-            FatalError( "Out of space!!!" );
+    for(i = 0; i < H->TableSize; i++)
+    {
+        H->TheLists[i] = malloc(sizeof(struct ListNode));
+        if(H->TheLists[i] == NULL)
+            FatalError("Out of space!!!");
         else
-            H->TheLists[ i ]->Next = NULL;
+            H->TheLists[i]->Next = NULL;
     }
-
     return H;
 }
 
-
 /* Find a Key in HashTable */
-Position Find( ElementType Key, HashTable H )
+Position Find(wchar_t Key, int Value, HashTable H)
 {
-    List L = H->TheLists[Hash( Key, H->TableSize )];
+    List L = H->TheLists[Value];
     Position P = L->Next;
 
-    while( P != NULL && P->Element != Key )
-        /* Probably need strcmp!! */
+    while(P != NULL && P->Element != Key)
         P = P->Next;
     
     return P;
@@ -95,70 +95,71 @@ Position Find( ElementType Key, HashTable H )
 
 
 /* Insert the Element Key passed as argument in HashTable H */
-void Insert( ElementType Key, HashTable H ){
+void Insert(wchar_t Key, int Value, HashTable H)
+{
     Position Pos, NewCell;
     List L;
 
-    Pos = Find( Key, H );
+    Pos = Find(Key, Value, H);
 
     /* Key is not found */
-    if( Pos == NULL ){  
-        NewCell = malloc( sizeof( struct ListNode ) );
+    if(Pos == NULL){  
+        NewCell = malloc(sizeof(struct ListNode));
 
-        if( NewCell == NULL )
+        if(NewCell == NULL)
             FatalError( "Out of space!!!" );
         
-        else{
-            L = H->TheLists[ Hash( Key, H->TableSize ) ];
+        else
+        {
+            L = H->TheLists[Value];
             NewCell->Next = L->Next;
             NewCell->Element = Key;  /* Probably need strcpy! */
             L->Next = NewCell;
         }
     }
-
     /* Key is found in HashTable */
     else
     {   
         //If the key is found in HT, we need to create another node 
         //to insert the element inside the list of the current hashtable position
-        NewCell = malloc( sizeof( struct ListNode ) );
+        NewCell = malloc(sizeof(struct ListNode));
         Pos->Next = NewCell;
         NewCell->Element = Key;
         NewCell->Next = NULL;
     }
 }
 
-
 /* Print the Element in Node P */
-ElementType Retrieve( Position P ){
+ElementType Retrieve(Position P)
+{
     return P->Element;
 }
 
-
 /* Free the ram occupied from HashTable */
-void DestroyTable( HashTable H ){
+void DestroyTable(HashTable H)
+{
     int i;
 
-    for( i = 0; i < H->TableSize; i++ )
+    for(i = 0; i < H->TableSize; i++)
     {
-        Position P = H->TheLists[ i ];
+        Position P = H->TheLists[i];
         Position Tmp;
 
-        while( P != NULL )
+        while(P != NULL)
         {
             Tmp = P->Next;
-            free( P );
+            free(P);
             P = Tmp;
         }
     }
 
-    free( H->TheLists );
-    free( H );
+    free(H->TheLists);
+    free(H);
 }
 
 
 /* Removes the Element X from the HashTable */
-HashTable Delete( ElementType X, HashTable T ){
+HashTable Delete(ElementType X, HashTable T){
     
     // Find the key of the Element X
     int key = Hash(X, T->TableSize);
@@ -201,7 +202,8 @@ HashTable Delete( ElementType X, HashTable T ){
 
 
 /* Free the allocated memory of Hashtable */
-HashTable MakeEmpty( HashTable T ){
+HashTable MakeEmpty(HashTable T)
+{
     /*for(int i=0 ; i<T->TableSize; i++)
     {
         Position P = T->TheLists[i];
@@ -225,13 +227,12 @@ void PrintHashTable(HashTable T)
     for(int i=0 ; i < T->TableSize ; i++)
     {   
         Position P = T->TheLists[i]->Next;
-
         if(P != NULL)
         {
             printf("%d\t[", i);
             while(P != NULL)
             {
-                printf("%d", P->Element);
+                printf("%lc", P->Element);
                 P = P->Next;
 
                 //If is not the last element
