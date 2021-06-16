@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
     begin = time(NULL);
 
     while (fwscanf(f, L"%ls", line) != EOF)
-        convertToT9(line);
+        convertToT9(line, T9);
     
     end = time(NULL);
     printf("Loaded the dictionary in: %fs\n", difftime(end,begin));

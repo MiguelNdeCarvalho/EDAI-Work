@@ -93,15 +93,30 @@ Position Find(wchar_t *Key, int Value, HashTable H)
     return P;
 }
 
-Position FindWOValue(wchar_t *Key, HashTable H)
+int FindWOValue(wchar_t * Key, HashTable H)
 {
-    List L = H->TheLists[Hash(*Key, H->TableSize)];
-    Position P = L->Next;
+    printf("Oi");
+    for(int i=0; i < H->TableSize; i++)
+    {   
+        Position P = H->TheLists[i]->Next;
+        printf("%ls %ls", P->Element, Key);
+        if(P != NULL)
+        {
+            while(P != NULL)
+            {
+                
+                if(wcscmp(P->Element, Key) == 0)
+                {
+                    return i;
+                }
 
-    while(P != NULL && wcscmp(P->Element, Key) != 0)
-        P = P->Next;
-    
-    return P;
+                P = P->Next;
+            }
+        }
+        else
+            return 0;
+    }
+    return 0;
 }
 
 
@@ -311,14 +326,17 @@ void defineT9(HashTable T)
     Insert(L"w", 9, T);
 }
 
-long convertToT9(wchar_t *input)
+long convertToT9(wchar_t *input, HashTable H)
 {
     setlocale(LC_ALL, "");
-    for (int i=0; i<wcslen(input); i++) {
-        //printf("%d",FindWOValue(input[i], T9));
+    for (int i=0; i<wcslen(input); i++) 
+    {
+        //printf("%lc - %d", input[i], FindWOValue(input[i], H));
+        FindWOValue(input[i], H);
+        
         
         //printf("%lc\n", input[i]);
     }
-    //printf("\n");
+    printf("\n");
     return 0;
 }
