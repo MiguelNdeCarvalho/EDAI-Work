@@ -246,6 +246,6 @@ void PrintHashTable(HashTable T)
             printf("]\n");
         }
         else
-            printf("%d\t[%s]\n", i, "--");
+            printf("%d\t[%s]\n", i, "");
     }
 }
