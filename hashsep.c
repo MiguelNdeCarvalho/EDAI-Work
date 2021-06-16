@@ -1,9 +1,12 @@
 #include "fatal.h"
 #include "hashsep.h"
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <locale.h>
+#include <math.h>
+#include <stdbool.h> 
 
 #define MinTableSize (10)
 typedef unsigned int Index;
@@ -93,28 +96,21 @@ Position Find(wchar_t *Key, int Value, HashTable H)
     return P;
 }
 
-int FindWOValue(wchar_t * Key, HashTable H)
+int FindWOValue(wchar_t Key, HashTable H)
 {
-    printf("Oi");
-    for(int i=0; i < H->TableSize; i++)
-    {   
+    for(int i=0 ; i < H->TableSize ; i++)
+    {
         Position P = H->TheLists[i]->Next;
-        printf("%ls %ls", P->Element, Key);
         if(P != NULL)
         {
             while(P != NULL)
             {
-                
-                if(wcscmp(P->Element, Key) == 0)
-                {
+                if(Key == P->Element[0])
                     return i;
-                }
-
+                
                 P = P->Next;
             }
         }
-        else
-            return 0;
     }
     return 0;
 }
@@ -326,17 +322,45 @@ void defineT9(HashTable T)
     Insert(L"w", 9, T);
 }
 
+int checkSpecialCharacter(wchar_t *input)
+{
+    wchar_t *pass = L"'";
+
+    for (size_t i=0; i<wcslen(input); i++) 
+    {
+        if(input[i] == pass[0])
+        {
+            return i;
+        }
+    }
+    return 0;
+}
+
 long convertToT9(wchar_t *input, HashTable H)
 {
+    int total=0;
+    int specialCharacterLine = checkSpecialCharacter(input);
+    bool containsSpecialCharacters;
+
+    
+    if(checkSpecialCharacter(input) == 0)
+        containsSpecialCharacters = false;
+    else
+        containsSpecialCharacters = true;
+
+
     setlocale(LC_ALL, "");
-    for (int i=0; i<wcslen(input); i++) 
+    for (size_t i=0; i<wcslen(input); i++) 
     {
-        //printf("%lc - %d", input[i], FindWOValue(input[i], H));
-        FindWOValue(input[i], H);
+        int value = FindWOValue(input[i], H);
         
+        if(containsSpecialCharacters == true && (int) i < specialCharacterLine)
+            total+= (value * pow(10,wcslen(input)-i-2));
         
-        //printf("%lc\n", input[i]);
+        else
+            total+= (value * pow(10,wcslen(input)-i-1));
     }
-    printf("\n");
-    return 0;
+    // printf("Palavra='%ls' Total=%d\n", input,total);
+    
+    return total;
 }
