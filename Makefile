@@ -16,6 +16,10 @@ ex-pt: build
 	   ./.compiled dictionaries/portuguese.txt
 	   rm .compiled
 
+ex-custom: build
+	  	   ./.compiled dictionaries/custom.txt
+	   	   rm .compiled
+
 build: 
 	gcc -Wextra -Wall -o .compiled main.c
 
