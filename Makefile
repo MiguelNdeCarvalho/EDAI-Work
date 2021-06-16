@@ -1,19 +1,19 @@
 all: build run clean
 
 ex-eng-freq: build
-			 ./.compiled dictionaries/english-freq.txt
+			 ./.compiled dictionaries/english-freq_lower.txt
 			 rm .compiled
 
 ex-eng: build
-		./.compiled dictionaries/english.txt
+		./.compiled dictionaries/english_lower.txt
 		rm .compiled
 
 ex-pt-lg: build
-		  ./.compiled dictionaries/portuguese-large.txt
+		  ./.compiled dictionaries/portuguese-large_lower.txt
 		  rm .compiled
 
 ex-pt: build
-	   ./.compiled dictionaries/portuguese.txt
+	   ./.compiled dictionaries/portuguese_lower.txt
 	   rm .compiled
 
 ex-custom: build
