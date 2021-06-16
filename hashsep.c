@@ -11,7 +11,7 @@ typedef Position List;
 
 struct ListNode
 {
-    ElementType Element;
+    wchar_t *Element;
     Position    Next;
 };
 
@@ -82,12 +82,12 @@ HashTable InitializeTable(int TableSize)
 }
 
 /* Find a Key in HashTable */
-Position Find(wchar_t Key, int Value, HashTable H)
+Position Find(wchar_t *Key, int Value, HashTable H)
 {
     List L = H->TheLists[Value];
     Position P = L->Next;
 
-    while(P != NULL && P->Element != Key)
+    while(P != NULL && wcscmp(P->Element, Key) != 0)
         P = P->Next;
     
     return P;
@@ -95,7 +95,7 @@ Position Find(wchar_t Key, int Value, HashTable H)
 
 
 /* Insert the Element Key passed as argument in HashTable H */
-void Insert(wchar_t Key, int Value, HashTable H)
+void Insert(wchar_t *Key, int Value, HashTable H)
 {
     Position Pos, NewCell;
     List L;
@@ -113,8 +113,10 @@ void Insert(wchar_t Key, int Value, HashTable H)
         {
             L = H->TheLists[Value];
             NewCell->Next = L->Next;
-            NewCell->Element = Key;  /* Probably need strcpy! */
+            NewCell->Element = malloc(sizeof(Key));
+            wcpcpy(NewCell->Element, Key);
             L->Next = NewCell;
+            //print_element(NewCell->Element);
         }
     }
     /* Key is found in HashTable */
@@ -122,17 +124,18 @@ void Insert(wchar_t Key, int Value, HashTable H)
     {   
         //If the key is found in HT, we need to create another node 
         //to insert the element inside the list of the current hashtable position
-        NewCell = malloc(sizeof(struct ListNode));
+        NewCell = malloc( sizeof( struct ListNode ) );
         Pos->Next = NewCell;
-        NewCell->Element = Key;
+        NewCell->Element = malloc(sizeof(Key));
+        wcpcpy(NewCell->Element, Key);
         NewCell->Next = NULL;
     }
 }
 
 /* Print the Element in Node P */
-ElementType Retrieve(Position P)
+wchar_t Retrieve(Position P)
 {
-    return P->Element;
+    return *P->Element;
 }
 
 /* Free the ram occupied from HashTable */
@@ -158,47 +161,47 @@ void DestroyTable(HashTable H)
 }
 
 
-/* Removes the Element X from the HashTable */
-HashTable Delete(ElementType X, HashTable T){
+// /* Removes the Element X from the HashTable */
+// HashTable Delete(ElementType X, HashTable T){
     
-    // Find the key of the Element X
-    int key = Hash(X, T->TableSize);
+//     // Find the key of the Element X
+//     int key = Hash(X, T->TableSize);
 
-    //Key finded
-    if(key != -1)
-    {
-        //If the key is finded we need to iterate over the List of that Key Hashtable Position to find the X
-        Position prevP = T->TheLists[key];
-        Position P = T->TheLists[key]->Next;
+//     //Key finded
+//     if(key != -1)
+//     {
+//         //If the key is finded we need to iterate over the List of that Key Hashtable Position to find the X
+//         Position prevP = T->TheLists[key];
+//         Position P = T->TheLists[key]->Next;
 
-        //X finded 
-        while(P != NULL)
-        {
-            if(P->Element == X && P->Next != NULL)
-            {   
-                printf("Deleted %d at index %d from HashTable\n", P->Element, key);
-                prevP->Next = P->Next->Next;
-                return T;
-            }
+//         //X finded 
+//         while(P != NULL)
+//         {
+//             if(P->Element == X && P->Next != NULL)
+//             {   
+//                 printf("Deleted %d at index %d from HashTable\n", P->Element, key);
+//                 prevP->Next = P->Next->Next;
+//                 return T;
+//             }
 
-            else if(P->Element == X && P->Next == NULL)
-            {
-                prevP->Next = NULL;
-                printf("Deleted %d at index %d from HashTable\n", P->Element, key);
-                return T;
-            }
+//             else if(P->Element == X && P->Next == NULL)
+//             {
+//                 prevP->Next = NULL;
+//                 printf("Deleted %d at index %d from HashTable\n", P->Element, key);
+//                 return T;
+//             }
 
-            prevP = P;
-            P = P->Next;       
-        }
-    }
+//             prevP = P;
+//             P = P->Next;       
+//         }
+//     }
 
-    //Key not finded 
-    else
-        FatalError("Element not present in HashTable");
+//     //Key not finded 
+//     else
+//         FatalError("Element not present in HashTable");
     
-    return T;
-}
+//     return T;
+// }
 
 
 /* Free the allocated memory of Hashtable */
@@ -232,7 +235,8 @@ void PrintHashTable(HashTable T)
             printf("%d\t[", i);
             while(P != NULL)
             {
-                printf("%lc", P->Element);
+                setlocale(LC_ALL, "");
+                printf("%ls", P->Element);
                 P = P->Next;
 
                 //If is not the last element
@@ -244,4 +248,9 @@ void PrintHashTable(HashTable T)
         else
             printf("%d\t[%s]\n", i, "--");
     }
+}
+
+void print_element(wchar_t *input)
+{
+    
 }
