@@ -41,7 +41,7 @@ static int NextPrime( int N )
 }
 
 /* Hash function for ints */
-Index Hash( ElementType Key, int TableSize ){
+long Hash ( unsigned long Key, int TableSize ){
     return Key % TableSize;
 }
 
@@ -85,7 +85,7 @@ HashTable InitializeTable(int TableSize)
 }
 
 /* Find a Key in HashTable */
-Position Find(wchar_t *Key, int Value, HashTable H)
+Position Find(wchar_t *Key, unsigned long Value, HashTable H)
 {
     List L = H->TheLists[Value];
     Position P = L->Next;
@@ -117,7 +117,7 @@ int FindWOValue(wchar_t Key, HashTable H)
 
 
 /* Insert the Element Key passed as argument in HashTable H */
-void Insert(wchar_t *Key, int Value, HashTable H)
+void Insert(wchar_t *Key, unsigned long Value, HashTable H)
 {
     Position Pos, NewCell;
     List L;
@@ -135,7 +135,7 @@ void Insert(wchar_t *Key, int Value, HashTable H)
         {
             L = H->TheLists[Value];
             NewCell->Next = L->Next;
-            NewCell->Element = malloc(sizeof(Key));
+            NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
             wcpcpy(NewCell->Element, Key);
             L->Next = NewCell;
             //print_element(NewCell->Element);
@@ -148,7 +148,46 @@ void Insert(wchar_t *Key, int Value, HashTable H)
         //to insert the element inside the list of the current hashtable position
         NewCell = malloc( sizeof( struct ListNode ) );
         Pos->Next = NewCell;
-        NewCell->Element = malloc(sizeof(Key));
+        NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
+        wcpcpy(NewCell->Element, Key);
+        NewCell->Next = NULL;
+    }
+}
+
+void InsertWord(wchar_t *Key, unsigned long K9_Value, HashTable H)
+{
+    //printf("%ls", Key);
+    Position Pos, NewCell;
+    List L;
+
+    unsigned long Value = Hash(K9_Value, H->TableSize);
+    Pos = Find(Key, Value, H);
+
+    /* Key is not found */
+    if(Pos == NULL){  
+        NewCell = malloc(sizeof(struct ListNode));
+
+        if(NewCell == NULL)
+            FatalError( "Out of space!!!" );
+        
+        else
+        {
+            L = H->TheLists[Value];
+            NewCell->Next = L->Next;
+            NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
+            wcpcpy(NewCell->Element, Key);
+            L->Next = NewCell;
+            //print_element(NewCell->Element);
+        }
+    }
+    /* Key is found in HashTable */
+    else
+    {   
+        //If the key is found in HT, we need to create another node 
+        //to insert the element inside the list of the current hashtable position
+        NewCell = malloc( sizeof( struct ListNode ) );
+        Pos->Next = NewCell;
+        NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
         wcpcpy(NewCell->Element, Key);
         NewCell->Next = NULL;
     }
@@ -336,9 +375,9 @@ int checkSpecialCharacter(wchar_t *input)
     return 0;
 }
 
-long convertToT9(wchar_t *input, HashTable H)
+unsigned long convertToT9(wchar_t *input, HashTable H)
 {
-    int total=0;
+    unsigned long total=0;
     int specialCharacterLine = checkSpecialCharacter(input);
     bool containsSpecialCharacters;
 
