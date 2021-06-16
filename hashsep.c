@@ -249,8 +249,3 @@ void PrintHashTable(HashTable T)
             printf("%d\t[%s]\n", i, "--");
     }
 }
-
-void print_element(wchar_t *input)
-{
-    
-}

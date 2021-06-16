@@ -20,6 +20,4 @@ void PrintHashTable(HashTable T);
 HashTable Delete(ElementType X, HashTable T);
 HashTable MakeEmpty(HashTable T);
 
-void print_element(wchar_t *input);
-
 #endif
