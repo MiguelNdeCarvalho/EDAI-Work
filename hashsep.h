@@ -20,4 +20,7 @@ void PrintHashTable(HashTable T);
 HashTable Delete(ElementType X, HashTable T);
 HashTable MakeEmpty(HashTable T);
 
+void defineT9(HashTable T);
+long convertToT9(wchar_t *input);
+
 #endif

@@ -249,3 +249,63 @@ void PrintHashTable(HashTable T)
             printf("%d\t[%s]\n", i, "");
     }
 }
+
+void defineT9(HashTable T)
+{
+    // key 2
+    Insert(L"ç", 2, T);
+    Insert(L"ã", 2, T);
+    Insert(L"â", 2, T);
+    Insert(L"à", 2, T);
+    Insert(L"á", 2, T);
+    Insert(L"c", 2, T);
+    Insert(L"b", 2, T);
+    Insert(L"a", 2, T);
+    // key 3
+    Insert(L"ê", 3, T);
+    Insert(L"é", 3, T);
+    Insert(L"f", 3, T);
+    Insert(L"e", 3, T);
+    Insert(L"d", 3, T);
+    // key 4
+    Insert(L"í", 4, T);
+    Insert(L"i", 4, T);
+    Insert(L"h", 4, T);
+    Insert(L"g", 4, T);
+    // key 5
+    Insert(L"l", 5, T);
+    Insert(L"k", 5, T);
+    Insert(L"j", 5, T);
+    // key 6
+    Insert(L"õ", 6, T);
+    Insert(L"ô", 6, T);
+    Insert(L"ó", 6, T);
+    Insert(L"o", 6, T);
+    Insert(L"n", 6, T);
+    Insert(L"m", 6, T);
+    // key 7
+    Insert(L"s", 7, T);
+    Insert(L"r", 7, T);
+    Insert(L"q", 7, T);
+    Insert(L"p", 7, T);
+    // key 8
+    Insert(L"ú", 8, T);
+    Insert(L"v", 8, T);
+    Insert(L"u", 8, T);
+    Insert(L"t", 8, T);
+    // key 9
+    Insert(L"z", 9, T);
+    Insert(L"y", 9, T);
+    Insert(L"x", 9, T);
+    Insert(L"w", 9, T);
+}
+
+long convertToT9(wchar_t *input)
+{
+    setlocale(LC_ALL, "");
+    for (int i=0; i<wcslen(input); i++) {
+        printf("%lc\n", input[i]);
+    }
+    printf("\n");
+    return 0;
+}
