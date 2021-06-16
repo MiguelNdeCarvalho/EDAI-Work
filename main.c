@@ -15,6 +15,7 @@ int main(int argc, char const *argv[])
     setlocale(LC_ALL, "");
     time_t begin, end;
     HashTable T9 = InitializeTable(11);
+    HashTable Dictionary = InitializeTable(8000000);
 
     defineT9(T9);
 
@@ -46,7 +47,12 @@ int main(int argc, char const *argv[])
     begin = time(NULL);
 
     while (fwscanf(f, L"%ls", line) != EOF)
-        convertToT9(line, T9);
+    {
+        //printf("Palavra: %ls convertToT9: %ld, Hash: %ld\n", line, convertToT9(line, T9), Hash(convertToT9(line, T9), Dictionary->TableSize));
+        InsertWord(line, convertToT9(line, T9), Dictionary);
+    }
+
+    PrintHashTable(Dictionary);
     
     end = time(NULL);
     printf("Loaded the dictionary in: %fs\n", difftime(end,begin));
