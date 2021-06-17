@@ -24,7 +24,7 @@ void loadDictionary(FILE *input, HashTable T9, HashTable Dictionary)
     fclose(input);
 }
 
-void interface(HashTable Dictionary)
+void interface(HashTable T9, HashTable Dictionary)
 {
     setlocale(LC_ALL, "");
     unsigned long input;
@@ -53,7 +53,7 @@ void interface(HashTable Dictionary)
         else if (input == 1)
             printf("Mensagem: %ls\n\n\n** Escreva a sua mensagem **\n", phrase);
         else
-            temp_word = getWord(input, Dictionary);
+            temp_word = getWord(input, T9, Dictionary);
 
         if (i == 0)
             wcscat(phrase, temp_word);
@@ -103,6 +103,6 @@ int main(int argc, char const *argv[])
     }
     
 
-    interface(Dictionary);
+    interface(T9, Dictionary);
     return 0;
 }
