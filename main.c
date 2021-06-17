@@ -6,16 +6,72 @@
 #include <time.h>
 #include "hashsep.c"
 
+void loadDictionary(FILE *input, HashTable T9, HashTable Dictionary)
+{
+    setlocale(LC_ALL, "");
+    time_t begin, end;
+    const unsigned MAX_LENGTH = 30;
+    wchar_t line[MAX_LENGTH];
+
+    begin = time(NULL);
+
+    while (fwscanf(input, L"%ls", line) != EOF)
+        InsertWord(line, convertToT9(line, T9), Dictionary);
+
+    end = time(NULL);
+    printf("Loaded the dictionary in: %fs\n", difftime(end,begin));
+
+    fclose(input);
+}
+
+void interface(HashTable Dictionary)
+{
+    setlocale(LC_ALL, "");
+    unsigned long input;
+    char auxInput;
+    wchar_t phrase[1000]=L"";
+    wchar_t *temp_word;
+    int i=0;
+
+    printf("** Escreva a sua mensagem **\n");
+    for(;;)
+    {
+        scanf("%ld", &input);
+        if (input == 0)
+        {
+            printf("Deseja sair da aplicação (s/n)? ");
+            scanf(" %c", &auxInput);
+            if (auxInput == 's')
+                exit(0);
+            else if (auxInput == 'n')
+                continue;
+            else{
+                printf("Deseja sair da aplicação (s/n)? ");
+                scanf(" %c", &auxInput);
+            }
+        }
+        else if (input == 1)
+            printf("Mensagem: %ls\n\n\n** Escreva a sua mensagem **\n", phrase);
+        else
+            temp_word = getWord(input, Dictionary);
+
+        if (i == 0)
+            wcscat(phrase, temp_word);
+        else {
+            wcscat(phrase, L" ");
+            wcscat(phrase, temp_word);
+        }
+
+        i++;
+    }
+}
+
 int main(int argc, char const *argv[])
 {
 
     FILE *f;
-    const unsigned MAX_LENGTH = 30;
-    wchar_t line[MAX_LENGTH];
-    setlocale(LC_ALL, "");
-    time_t begin, end;
     HashTable T9 = InitializeTable(11);
-    HashTable Dictionary = InitializeTable(8000000);
+    HashTable Dictionary = InitializeTable(10000000);
 
     defineT9(T9);
 
@@ -35,6 +91,8 @@ int main(int argc, char const *argv[])
             printf("File not found!\nCheck if the path of the file is correct.");
             exit(1);
         }
+
+        loadDictionary(f, T9, Dictionary);
     }
 
     else
@@ -44,20 +102,7 @@ int main(int argc, char const *argv[])
         exit(1);
     }
     
-    begin = time(NULL);
 
-    while (fwscanf(f, L"%ls", line) != EOF)
-    {
-        //printf("Palavra: %ls convertToT9: %ld, Hash: %ld\n", line, convertToT9(line, T9), Hash(convertToT9(line, T9), Dictionary->TableSize));
-        InsertWord(line, convertToT9(line, T9), Dictionary);
-    }
-
-    PrintHashTable(Dictionary);
-    
-    end = time(NULL);
-    printf("Loaded the dictionary in: %fs\n", difftime(end,begin));
-
-    fclose(f);
+    interface(Dictionary);
     return 0;
 }
-
