@@ -4,7 +4,7 @@
 #include <string.h>
 #include <wchar.h>
 #include <time.h>
-#include "hashsep.c"
+#include "hashtable.h"
 
 void loadDictionary(FILE *input, HashTable T9, HashTable Dictionary)
 {

@@ -1,5 +1,3 @@
-#include "fatal.h"
-#include "hashsep.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,6 +5,8 @@
 #include <locale.h>
 #include <math.h>
 #include <stdbool.h> 
+#include "fatal.h"
+#include "hashtable.h"
 
 #define MinTableSize (10)
 typedef unsigned int Index;
