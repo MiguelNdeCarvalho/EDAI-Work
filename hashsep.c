@@ -134,6 +134,13 @@ void Insert(wchar_t *Key, unsigned long Value, HashTable H)
         else
         {
             L = H->TheLists[Value];
+
+            while (L != NULL ) {
+                if(L-> Next == NULL)
+                    break;
+                L = L-> Next;                
+            }
+            
             NewCell->Next = L->Next;
             NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
             wcpcpy(NewCell->Element, Key);
@@ -173,6 +180,13 @@ void InsertWord(wchar_t *Key, unsigned long K9_Value, HashTable H)
         else
         {
             L = H->TheLists[Value];
+
+            while (L != NULL ) {
+                if(L-> Next == NULL)
+                    break;
+                L = L-> Next;                
+            }
+
             NewCell->Next = L->Next;
             NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
             wcpcpy(NewCell->Element, Key);
@@ -314,51 +328,51 @@ void PrintHashTable(HashTable T)
 void defineT9(HashTable T)
 {
     // key 2
-    Insert(L"ç", 2, T);
-    Insert(L"ã", 2, T);
-    Insert(L"â", 2, T);
-    Insert(L"à", 2, T);
-    Insert(L"á", 2, T);
-    Insert(L"c", 2, T);
-    Insert(L"b", 2, T);
     Insert(L"a", 2, T);
+    Insert(L"b", 2, T);
+    Insert(L"c", 2, T);
+    Insert(L"á", 2, T);
+    Insert(L"à", 2, T);
+    Insert(L"â", 2, T);
+    Insert(L"ã", 2, T);
+    Insert(L"ç", 2, T);
     // key 3
-    Insert(L"ê", 3, T);
-    Insert(L"é", 3, T);
-    Insert(L"f", 3, T);
-    Insert(L"e", 3, T);
     Insert(L"d", 3, T);
+    Insert(L"e", 3, T);
+    Insert(L"f", 3, T);
+    Insert(L"é", 3, T);
+    Insert(L"ê", 3, T);
     // key 4
-    Insert(L"í", 4, T);
-    Insert(L"i", 4, T);
-    Insert(L"h", 4, T);
     Insert(L"g", 4, T);
+    Insert(L"h", 4, T);
+    Insert(L"i", 4, T);
+    Insert(L"í", 4, T);
     // key 5
-    Insert(L"l", 5, T);
-    Insert(L"k", 5, T);
     Insert(L"j", 5, T);
+    Insert(L"k", 5, T);
+    Insert(L"l", 5, T);
     // key 6
-    Insert(L"õ", 6, T);
-    Insert(L"ô", 6, T);
-    Insert(L"ó", 6, T);
-    Insert(L"o", 6, T);
-    Insert(L"n", 6, T);
     Insert(L"m", 6, T);
+    Insert(L"n", 6, T);
+    Insert(L"o", 6, T);
+    Insert(L"ó", 6, T);
+    Insert(L"ô", 6, T);
+    Insert(L"õ", 6, T);
     // key 7
-    Insert(L"s", 7, T);
-    Insert(L"r", 7, T);
-    Insert(L"q", 7, T);
     Insert(L"p", 7, T);
+    Insert(L"q", 7, T);
+    Insert(L"r", 7, T);
+    Insert(L"s", 7, T);
     // key 8
-    Insert(L"ú", 8, T);
-    Insert(L"v", 8, T);
-    Insert(L"u", 8, T);
     Insert(L"t", 8, T);
+    Insert(L"u", 8, T);
+    Insert(L"v", 8, T);
+    Insert(L"ú", 8, T);
     // key 9
-    Insert(L"z", 9, T);
-    Insert(L"y", 9, T);
-    Insert(L"x", 9, T);
     Insert(L"w", 9, T);
+    Insert(L"x", 9, T);
+    Insert(L"y", 9, T);
+    Insert(L"z", 9, T);
 }
 
 int checkSpecialCharacter(wchar_t *input)
@@ -404,13 +418,13 @@ unsigned long convertToT9(wchar_t *input, HashTable H)
     return total;
 }
 
-wchar_t* getWord(unsigned long input, HashTable H)
+wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary)
 {
-    unsigned long index = Hash(input, H->TableSize);
+    unsigned long index = Hash(input, Dictionary->TableSize);
     char flag;
-    wchar_t *inputWord;
+    wchar_t *inputWord= malloc(sizeof(wchar_t*) * 30);
 
-    Position P = H->TheLists[index]->Next;
+    Position P = Dictionary->TheLists[index]->Next;
 
     if(P != NULL)
     {
@@ -431,9 +445,8 @@ wchar_t* getWord(unsigned long input, HashTable H)
                 { //Fazer scan da nova palavra e adicionar na Hashtable
                     setlocale(LC_ALL, "");
                     printf("Não existem mais sugestões; introduza a palavra do teclado.\n");
-                    wscanf(L" %ls", inputWord);
-                    //printf("\n%ls ", inputWord);
-                    
+                    scanf("%ls", inputWord);
+                    InsertWord(inputWord, convertToT9(inputWord, T9), Dictionary);
                     return inputWord;
                 }
             }

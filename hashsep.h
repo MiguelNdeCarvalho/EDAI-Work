@@ -26,6 +26,6 @@ HashTable MakeEmpty(HashTable T);
 void defineT9(HashTable T);
 int checkSpecialCharacter(wchar_t *input);
 unsigned long convertToT9(wchar_t *input, HashTable H);
-wchar_t* getWord(unsigned long input, HashTable H);
+wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary);
 
 #endif
