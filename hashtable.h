@@ -23,9 +23,10 @@ void PrintHashTable(HashTable T);
 HashTable Delete(ElementType X, HashTable T);
 HashTable MakeEmpty(HashTable T);
 
-void defineT9(HashTable T);
-int checkSpecialCharacter(wchar_t *input);
-unsigned long convertToT9(wchar_t *input, HashTable H);
-wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary);
-
+void LoadT9Keys(HashTable T);
+void LoadDictionary(FILE *input, HashTable T9, HashTable Dictionary);
+int CheckExistenceOfSpecialCharacter(wchar_t *input);
+unsigned long ConvertWordToT9Keys(wchar_t *input, HashTable H);
+wchar_t* SuggestWord(unsigned long input, HashTable T9, HashTable Dictionary);
+void interface(HashTable T9, HashTable Dictionary);
 #endif

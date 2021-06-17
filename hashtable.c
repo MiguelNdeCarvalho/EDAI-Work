@@ -1,10 +1,10 @@
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <locale.h>
 #include <math.h>
 #include <stdbool.h> 
+#include <time.h>
 #include "fatal.h"
 #include "hashtable.h"
 
@@ -25,7 +25,6 @@ struct HashTbl
 };
 
 
-/* Return next prime; assume N >= MinTableSize */
 static int NextPrime( int N )
 {
     if(N % 2 == 0)
@@ -34,21 +33,17 @@ static int NextPrime( int N )
     {
         for(int i = 3; i * i <= N; i += 2)
             if(N % i == 0)
-                goto ContOuter;  /* Sorry about this! */
+                goto ContOuter;
         return N;
     ContOuter:;
     }
 }
 
-/* Hash function for ints */
 long Hash ( unsigned long Key, int TableSize ){
     return Key % TableSize;
 }
 
 
-/* Initialize the Table, 
-making the correspondent malloc() and allocate the array of lists and them Headers 
-to use on HashTable positions */
 HashTable InitializeTable(int TableSize)
 {
     HashTable H;
@@ -84,7 +79,6 @@ HashTable InitializeTable(int TableSize)
     return H;
 }
 
-/* Find a Key in HashTable */
 Position Find(wchar_t *Key, unsigned long Value, HashTable H)
 {
     List L = H->TheLists[Value];
@@ -148,22 +142,10 @@ void Insert(wchar_t *Key, unsigned long Value, HashTable H)
             //print_element(NewCell->Element);
         }
     }
-    /* Key is found in HashTable */
-    else
-    {   
-        //If the key is found in HT, we need to create another node 
-        //to insert the element inside the list of the current hashtable position
-        NewCell = malloc( sizeof( struct ListNode ) );
-        Pos->Next = NewCell;
-        NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
-        wcpcpy(NewCell->Element, Key);
-        NewCell->Next = NULL;
-    }
 }
 
 void InsertWord(wchar_t *Key, unsigned long K9_Value, HashTable H)
 {
-    //printf("%ls", Key);
     Position Pos, NewCell;
     List L;
 
@@ -191,29 +173,16 @@ void InsertWord(wchar_t *Key, unsigned long K9_Value, HashTable H)
             NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
             wcpcpy(NewCell->Element, Key);
             L->Next = NewCell;
-            //print_element(NewCell->Element);
         }
-    }
-    /* Key is found in HashTable */
-    else
-    {   
-        //If the key is found in HT, we need to create another node 
-        //to insert the element inside the list of the current hashtable position
-        NewCell = malloc( sizeof( struct ListNode ) );
-        Pos->Next = NewCell;
-        NewCell->Element = malloc(sizeof(wchar_t*) * wcslen(Key));
-        wcpcpy(NewCell->Element, Key);
-        NewCell->Next = NULL;
     }
 }
 
-/* Print the Element in Node P */
+
 wchar_t Retrieve(Position P)
 {
     return *P->Element;
 }
 
-/* Free the ram occupied from HashTable */
 void DestroyTable(HashTable H)
 {
     int i;
@@ -235,51 +204,6 @@ void DestroyTable(HashTable H)
     free(H);
 }
 
-
-// /* Removes the Element X from the HashTable */
-// HashTable Delete(ElementType X, HashTable T){
-    
-//     // Find the key of the Element X
-//     int key = Hash(X, T->TableSize);
-
-//     //Key finded
-//     if(key != -1)
-//     {
-//         //If the key is finded we need to iterate over the List of that Key Hashtable Position to find the X
-//         Position prevP = T->TheLists[key];
-//         Position P = T->TheLists[key]->Next;
-
-//         //X finded 
-//         while(P != NULL)
-//         {
-//             if(P->Element == X && P->Next != NULL)
-//             {   
-//                 printf("Deleted %d at index %d from HashTable\n", P->Element, key);
-//                 prevP->Next = P->Next->Next;
-//                 return T;
-//             }
-
-//             else if(P->Element == X && P->Next == NULL)
-//             {
-//                 prevP->Next = NULL;
-//                 printf("Deleted %d at index %d from HashTable\n", P->Element, key);
-//                 return T;
-//             }
-
-//             prevP = P;
-//             P = P->Next;       
-//         }
-//     }
-
-//     //Key not finded 
-//     else
-//         FatalError("Element not present in HashTable");
-    
-//     return T;
-// }
-
-
-/* Free the allocated memory of Hashtable */
 HashTable MakeEmpty(HashTable T)
 {
     /*for(int i=0 ; i<T->TableSize; i++)
@@ -297,7 +221,6 @@ HashTable MakeEmpty(HashTable T)
 }
 
 
-/* Display HashTable in Terminal */
 void PrintHashTable(HashTable T)
 {
     printf("* Printing HashTable *\n");
@@ -325,7 +248,9 @@ void PrintHashTable(HashTable T)
     }
 }
 
-void defineT9(HashTable T)
+// Load default T9Keys
+
+void LoadT9Keys(HashTable T)
 {
     // key 2
     Insert(L"a", 2, T);
@@ -375,7 +300,27 @@ void defineT9(HashTable T)
     Insert(L"z", 9, T);
 }
 
-int checkSpecialCharacter(wchar_t *input)
+// Load Words from dictionary to the Hashtable
+void LoadDictionary(FILE *input, HashTable T9, HashTable Dictionary)
+{
+    setlocale(LC_ALL, "");
+    time_t begin, end;
+    const unsigned MAX_LENGTH = 30;
+    wchar_t line[MAX_LENGTH];
+
+    begin = time(NULL);
+
+    while (fwscanf(input, L"%ls", line) != EOF)
+        InsertWord(line, ConvertWordToT9Keys(line, T9), Dictionary);
+
+    end = time(NULL);
+    printf("Loaded the dictionary in: %fs\n", difftime(end,begin));
+
+    fclose(input);
+}
+
+//Check if we find a special character "'" and returns his position or 0 when there isn't
+int CheckExistenceOfSpecialCharacter(wchar_t *input)
 {
     wchar_t *pass = L"'";
 
@@ -383,46 +328,41 @@ int checkSpecialCharacter(wchar_t *input)
     {
         if(input[i] == pass[0])
         {
-            return i;
+            return i; //return the index of the array where it is
         }
     }
     return 0;
 }
 
-unsigned long convertToT9(wchar_t *input, HashTable H)
+//Convert the Word into T9Keys
+unsigned long ConvertWordToT9Keys(wchar_t *input, HashTable H)
 {
-    unsigned long total=0;
-    int specialCharacterLine = checkSpecialCharacter(input);
+    unsigned long total=0; //Converted in T9Keys
+    int specialCharacterLine = CheckExistenceOfSpecialCharacter(input);
     bool containsSpecialCharacters;
-
     
-    if(checkSpecialCharacter(input) == 0)
+    if(CheckExistenceOfSpecialCharacter(input) == 0)
         containsSpecialCharacters = false;
     else
         containsSpecialCharacters = true;
 
-
-    setlocale(LC_ALL, "");
     for (size_t i=0; i<wcslen(input); i++) 
     {
-        int value = FindWOValue(input[i], H);
-        
+        int value = FindWOValue(input[i], H); // Index of special character
+
         if(containsSpecialCharacters == true && (int) i < specialCharacterLine)
-            total+= (value * pow(10,wcslen(input)-i-2));
-        
+            total+= (value * pow(10,wcslen(input)-i-2)); // -2, because it doesn't count with the special character
         else
             total+= (value * pow(10,wcslen(input)-i-1));
     }
-    // printf("Palavra='%ls' Total=%d\n", input,total);
-    
-    return total;
+    return total; //return the value of the word converted
 }
 
-wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary)
+wchar_t* SuggestWord(unsigned long input, HashTable T9, HashTable Dictionary)
 {
     unsigned long index = Hash(input, Dictionary->TableSize);
-    char flag;
-    wchar_t *inputWord= malloc(sizeof(wchar_t*) * 30);
+    char choice; // Register user interaction (s/n)
+    wchar_t *inputWord= malloc(sizeof(wchar_t*) * 30); //Allocate space for the word that user wants to add (not on the dictionary)
 
     Position P = Dictionary->TheLists[index]->Next;
 
@@ -431,14 +371,14 @@ wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary)
         while(P != NULL)
         {   
             printf("Sugestão: %ls, aceita (s/n)? ", P->Element);
-            scanf(" %c", &flag);
+            scanf(" %c", &choice);
             
-            if (flag == 's')
+            if (choice == 's')
             {
                 return P->Element;
                 break;
             }
-            else if (flag == 'n')
+            else if (choice == 'n')
             {
                 P = P->Next;
                 if (P == NULL)
@@ -446,16 +386,59 @@ wchar_t* getWord(unsigned long input, HashTable T9, HashTable Dictionary)
                     setlocale(LC_ALL, "");
                     printf("Não existem mais sugestões; introduza a palavra do teclado.\n");
                     scanf("%ls", inputWord);
-                    InsertWord(inputWord, convertToT9(inputWord, T9), Dictionary);
+                    InsertWord(inputWord, ConvertWordToT9Keys(inputWord, T9), Dictionary);
                     return inputWord;
                 }
             }
             else
             {
                 printf("Sugestão: %ls, aceita (s/n)? ", P->Element);
-                scanf("%c", &flag);
+                scanf("%c", &choice);
             }
         }
     }
-    return L"";
+    return L"";//Return nothing, just to fix warnings by GCC
+}
+
+// Where the prompted interface that user sees is.
+void interface(HashTable T9, HashTable Dictionary)
+{
+    setlocale(LC_ALL, "");
+    unsigned long input;
+    char auxInput;
+    wchar_t phrase[1000]=L"";
+    wchar_t *temp_word;
+    int i=0;
+
+    printf("** Escreva a sua mensagem **\n");
+    for(;;)
+    {
+        scanf("%ld", &input);
+        if (input == 0)
+        {
+            printf("Deseja sair da aplicação (s/n)? ");
+            scanf(" %c", &auxInput);
+            if (auxInput == 's')
+                exit(0);
+            else if (auxInput == 'n')
+                continue;
+            else{
+                printf("Deseja sair da aplicação (s/n)? ");
+                scanf(" %c", &auxInput);
+            }
+        }
+        else if (input == 1)
+            printf("Mensagem: %ls\n\n** Escreva a sua mensagem **\n", phrase);
+        else
+            temp_word = SuggestWord(input, T9, Dictionary);
+
+        if (i == 0)
+            wcscat(phrase, temp_word);
+        else {
+            wcscat(phrase, L" ");
+            wcscat(phrase, temp_word);
+        }
+
+        i++;
+    }
 }
