@@ -21,7 +21,7 @@ ex-custom: build
 	   	   rm .compiled
 
 build: 
-	gcc -lm -Wextra -Wall -o .compiled main.c
+	gcc -lm -Wextra -Wall -o .compiled main.c hashtable.c
 
 run: 
 	./.compiled ${file}
