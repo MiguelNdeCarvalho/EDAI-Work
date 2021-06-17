@@ -403,3 +403,46 @@ unsigned long convertToT9(wchar_t *input, HashTable H)
     
     return total;
 }
+
+wchar_t* getWord(unsigned long input, HashTable H)
+{
+    unsigned long index = Hash(input, H->TableSize);
+    char flag;
+    wchar_t *inputWord;
+
+    Position P = H->TheLists[index]->Next;
+
+    if(P != NULL)
+    {
+        while(P != NULL)
+        {   
+            printf("Sugestão: %ls, aceita (s/n)? ", P->Element);
+            scanf(" %c", &flag);
+            
+            if (flag == 's')
+            {
+                return P->Element;
+                break;
+            }
+            else if (flag == 'n')
+            {
+                P = P->Next;
+                if (P == NULL)
+                { //Fazer scan da nova palavra e adicionar na Hashtable
+                    setlocale(LC_ALL, "");
+                    printf("Não existem mais sugestões; introduza a palavra do teclado.\n");
+                    wscanf(L" %ls", inputWord);
+                    //printf("\n%ls ", inputWord);
+                    
+                    return inputWord;
+                }
+            }
+            else
+            {
+                printf("Sugestão: %ls, aceita (s/n)? ", P->Element);
+                scanf("%c", &flag);
+            }
+        }
+    }
+    return L"";
+}
